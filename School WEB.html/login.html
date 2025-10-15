@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+
+<link rel="icon" type="image/x-icon" href="Logo.png">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 320px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #2575fc;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #1b5fd1;
+    }
+
+    p {
+      margin-top: 10px;
+    }
+
+    a {
+      color: #2575fc;
+      text-decoration: none;
+    }
+
+    #message {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+      <button type="submit">Login</button>
+    </form>
+
+    <p>Belum punya akun? <a href="signup.html">Daftar di sini!</a></p>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      // Ambil semua data akun
+      let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
+
+      // Jika akun tidak ada
+      if (!usersData[username]) {
+        document.getElementById("message").textContent = "Akun tidak ditemukan!";
+        return;
+      }
+
+      // Jika password salah
+      if (usersData[username].password !== password) {
+        document.getElementById("message").textContent = "Password salah!";
+        return;
+      }
+
+      // Login berhasil → simpan siapa yang sedang login
+      localStorage.setItem("currentUser", username);
+      document.getElementById("message").style.color = "green";
+      document.getElementById("message").textContent = "Login berhasil!";
+
+      // Arahkan ke halaman utama
+      setTimeout(() => {
+        window.location.href = "beranda.html";
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
+

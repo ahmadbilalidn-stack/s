@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up Page</title>
+
+  <link rel="icon" type="image/x-icon" href="Logo.png">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .signup-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 320px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #2575fc;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #1b5fd1;
+    }
+
+    p {
+      margin-top: 10px;
+    }
+
+    a {
+      color: #ff5e62;
+      text-decoration: none;
+    }
+
+    #message {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="signup-container">
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+      <input type="text" id="newUsername" placeholder="Buat Username" required><br>
+      <input type="password" id="newPassword" placeholder="Buat Password" required><br>
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <p>Sudah punya akun? <a href="login.html">Login di sini!</a></p>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const newUsername = document.getElementById("newUsername").value.trim();
+      const newPassword = document.getElementById("newPassword").value.trim();
+
+      if (!newUsername || !newPassword) {
+        document.getElementById("message").textContent = "Isi semua kolom terlebih dahulu!";
+        return;
+      }
+
+      // Ambil semua akun yang sudah ada
+      let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
+
+      // Cek apakah username sudah dipakai
+      if (usersData[newUsername]) {
+        document.getElementById("message").textContent = "Username sudah terdaftar!";
+        return;
+      }
+
+      // Simpan akun baru dengan struktur lengkap (termasuk progress to-do list kosong)
+      usersData[newUsername] = {
+        password: newPassword,
+        tasks: []
+      };
+
+      // Simpan ke localStorage
+      localStorage.setItem("usersData", JSON.stringify(usersData));
+
+      // Pesan sukses
+      document.getElementById("message").style.color = "green";
+      document.getElementById("message").textContent = "Akun berhasil dibuat! Silakan login.";
+
+      // Kosongkan form setelah daftar
+      document.getElementById("signupForm").reset();
+
+      // Arahkan ke login.html setelah 1 detik
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+
+  <!-- ✅ Tambahkan favicon di dalam <head> -->
+  <link rel="icon" type="image/x-icon" href="Logo.png">
+  <!-- contoh: href="favicon.ico" atau href="images/logo.png" -->
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e3f2fd;
+      margin: 0;
+    }
+
+    /* --- NAVBAR --- */
+    .navbar {
+      background-color: #1976d2;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .navbar .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .navbar ul li a:hover {
+      color: #bbdefb;
+    }
+
+    /* --- KONTEN --- */
+    .content {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    /* --- PENGINGAT --- */
+    .reminder {
+      background: #fff3cd;
+      border: 1px solid #ffecb5;
+      color: #856404;
+      padding: 15px 40px 15px 15px;
+      border-radius: 10px;
+      width: 60%;
+      margin: 20px auto;
+      font-size: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: relative;
+      animation: fadeIn 0.6s ease;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      text-align: left;
+    }
+
+    .reminder.hide {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #856404;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .close-btn:hover {
+      color: #d9534f;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- SLIDER --- */
+    .slider {
+      position: relative;
+      width: 600px;
+      height: 350px;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      margin: 40px auto;
+    }
+
+    .slides {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+
+    .slides img {
+      width: 600px;
+      height: 350px;
+      object-fit: cover;
+      transition: filter 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .slides img:hover {
+      filter: brightness(0.7);
+      transform: scale(1.03);
+    }
+
+    .btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 20px;
+      border-radius: 50%;
+    }
+
+    .btn:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    .prev { left: 15px; }
+    .next { right: 15px; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo" id="usernameDisplay">MyWebsite</div>
+    <ul>
+      <li><a href="beranda.html">Home</a></li>
+      <li><a href="todo.html">To-Do List</a></li>
+      <li><a href="audio.html">Quran</a></li>
+      <li><a href="https://scratch.mit.edu/projects/967606548/fullscreen/">Game</a></li>
+      <li><a href="tentang.html">About</a></li>
+      <li><a href="#" id="logoutLink">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Konten -->
+  <div class="content">
+    <h2 id="welcomeText">Selamat Datang 🎉</h2>
+
+    <!-- Pengingat Harian -->
+    <div class="reminder" id="dailyReminder">
+      <button class="close-btn" id="closeReminder1">✕</button>
+      <span id="dailyMessage">Memuat pengingat harian...</span>
+    </div>
+
+    <!-- Pengingat Tugas -->
+    <div class="reminder" id="taskReminder">
+      <button class="close-btn" id="closeReminder2">✕</button>
+      <span id="taskMessage">Memuat pengingat tugas...</span>
+    </div>
+
+    <!-- Slider -->
+    <div class="slider">
+      <div class="slides" id="slides">
+        <a href="todo.html">
+          <img src="To-Do List.png" alt="To-Do List">
+        </a>
+        <a href="audio.html">
+          <img src="Quran Audio.png" alt="Quran Audio">
+        </a>
+        <a href="https://scratch.mit.edu/projects/967606548/fullscreen/">
+          <img src="Game.png" alt="Game">
+        </a>
+      </div>
+      <button class="btn prev" onclick="prevSlide()">❮</button>
+      <button class="btn next" onclick="nextSlide()">❯</button>
+    </div>
+  </div>
+
+  <script>
+    // --- CEK LOGIN ---
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      alert("Silakan login terlebih dahulu!");
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("usernameDisplay").textContent = currentUser;
+      document.getElementById("welcomeText").textContent = "Selamat datang, " + currentUser + "!";
+    }
+
+    // --- LOGOUT ---
+    document.getElementById("logoutLink").addEventListener("click", function(e) {
+      e.preventDefault();
+      localStorage.removeItem("currentUser");
+      alert("Anda telah logout.");
+      window.location.href = "login.html";
+    });
+
+    // --- PENGINGAT HARIAN ---
+    function tampilkanPengingatHarian() {
+      const now = new Date();
+      const jam = now.getHours();
+      let pesan = "";
+
+      if (jam < 10) pesan = `🌅 Selamat pagi, ${currentUser}! Jangan lupa sarapan dan semangat 💪`;
+      else if (jam < 14) pesan = `☀️ Selamat siang, ${currentUser}! Jangan lupa minum air 💧`;
+      else if (jam < 18) pesan = `🌇 Selamat sore, ${currentUser}! Selesaikan tugasmu hari ini 📋`;
+      else pesan = `🌙 Selamat malam, ${currentUser}! Waktunya istirahat 😴`;
+
+      document.getElementById("dailyMessage").textContent = pesan;
+    }
+    tampilkanPengingatHarian();
+
+    // --- PENGINGAT TUGAS ---
+    function tampilkanPengingatTugas() {
+      const allData = JSON.parse(localStorage.getItem("usersData")) || {};
+      const userData = allData[currentUser];
+
+      if (!userData || !userData.tasks) {
+        document.getElementById("taskMessage").textContent =
+          "📋 Kamu belum memiliki tugas apapun di To-Do List.";
+        return;
+      }
+
+      const belumSelesai = userData.tasks.filter(t => !t.completed);
+      if (belumSelesai.length > 0) {
+        document.getElementById("taskMessage").textContent =
+          `📌 Kamu masih punya ${belumSelesai.length} tugas yang belum selesai. Yuk cek di halaman To-Do List!`;
+      } else {
+        document.getElementById("taskMessage").textContent =
+          "✅ Semua tugasmu sudah selesai, hebat sekali 🎉";
+      }
+    }
+    tampilkanPengingatTugas();
+
+    // --- TUTUP PENGINGAT ---
+    function tutupReminder(id) {
+      const el = document.getElementById(id);
+      el.classList.add("hide");
+      setTimeout(() => el.style.display = "none", 400);
+    }
+
+    document.getElementById("closeReminder1").addEventListener("click", () => tutupReminder("dailyReminder"));
+    document.getElementById("closeReminder2").addEventListener("click", () => tutupReminder("taskReminder"));
+
+    // --- AUTO-HIDE PENGINGAT ---
+    setTimeout(() => tutupReminder("dailyReminder"), 3000);
+    setTimeout(() => tutupReminder("taskReminder"), 5000);
+
+    // --- SLIDER ---
+    let index = 0;
+    const slides = document.getElementById('slides');
+    const total = slides.children.length;
+
+    function showSlide() {
+      slides.style.transform = `translateX(-${index * 600}px)`;
+    }
+
+    function nextSlide() {
+      index = (index + 1) % total;
+      showSlide();
+    }
+
+    function prevSlide() {
+      index = (index - 1 + total) % total;
+      showSlide();
+    }
+
+    // Auto-swipe setiap 5 detik
+    setInterval(nextSlide, 5000);
+  </script>
+</body>
+</html>
