@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quran</title>
+
+   <link rel="icon" type="image/x-icon" href="Logo.png">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f7fc;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #1976d2;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .navbar .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .navbar ul li a:hover {
+      color: #bbdefb;
+    }
+
+    /* Player */
+    .player {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 900px;
+      margin: 40px auto;
+    }
+
+    button {
+      background: #8e8e8e;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #2d2d2d;
+    }
+
+    .time {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    /* Search bar */
+    #searchBar {
+      width: 98%;
+      max-width: 900px;
+      padding: 10px;
+      margin: 20px auto;
+      display: block;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    /* Playlist grid */
+    .playlist {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+      justify-items: stretch;
+    }
+
+    .playlist-item {
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      background-color: #f9f9f9;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    .playlist-item:hover {
+      background: #e3f2fd;
+    }
+
+    .playlist-item.active {
+      background: #bbdefb;
+      font-weight: bold;
+      border-color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo" id="usernameDisplay">MyWebsite</div>
+    <ul>
+      <li><a href="beranda.html">Home</a></li>
+      <li><a href="todo.html">To-Do List</a></li>
+      <li><a href="tentang.html">About</a></li>
+      <li><a href="#" id="logoutLink">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- AUDIO PLAYER -->
+  <div class="player">
+    <h2>📖 Quran Audio</h2>
+    <audio id="audioPlayer"></audio>
+
+    <div>
+      <button onclick="prevSong()">⏮️ </button>
+      <button id="playPauseBtn" onclick="togglePlayPause()">▶️ </button>
+      <button onclick="nextSong()">⏭️ </button>
+    </div>
+
+    <input type="range" id="seekBar" value="0" min="0" max="100">
+    <div class="time">
+      <span id="currentTime">0:00</span> / 
+      <span id="duration">0:00</span>
+    </div>
+
+    <!-- Search Bar -->
+    <input type="text" id="searchBar" placeholder="Cari surat...">
+
+    <div class="playlist" id="playlist"></div>
+  </div>
+
+  <script>
+    // --- CEK LOGIN ---
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      alert("Silakan login terlebih dahulu!");
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("usernameDisplay").textContent = currentUser;
+    }
+
+    // --- LOGOUT ---
+    document.getElementById("logoutLink").addEventListener("click", function(e) {
+      e.preventDefault();
+      localStorage.removeItem("currentUser");
+      alert("Anda telah logout.");
+      window.location.href = "login.html";
+    });
+
+    // --- PLAYLIST ---
+    const songs = [
+      { title: "An-Naba", src: "annaba.mp3" },
+      { title: "An-Naziat", src: "annaziat.mp3" },
+      { title: "Abasa", src: "abasa.mp3" },
+      { title: "At-Takwir", src: "attakwir.mp3" },
+      { title: "Al-Infithar", src: "alinfitar.mp3" },
+      { title: "Al-Muthafifin", src: "almuthafifin.mp3" },
+      { title: "Al-Insyiqaq", src: "alinsyiqaq.mp3" },
+      { title: "Al-Buruj", src: "alburuj.mp3" },
+      { title: "At-Tariq", src: "attariq.mp3" },
+      { title: "Al-A'la", src: "alala.mp3" },
+      { title: "Al-Ghasiyyah", src: "alghasiyyah.mp3" },
+      { title: "Al-Fajr", src: "alfajr.mp3" },
+      { title: "Al-Balad", src: "albalad.mp3" },
+      { title: "As-Syams", src: "asyams.mp3" },
+      { title: "Al-Lail", src: "allail.mp3" },
+      { title: "Ad-Duha", src: "adduha.mp3" },
+      { title: "Al-Insyirah", src: "alinsyirah.mp3" },
+      { title: "At-Tin", src: "attin.mp3" },
+      { title: "Al-Alaq", src: "alalaq.mp3" },
+      { title: "Al-Qadr", src: "alqadar.mp3" },
+      { title: "Al-Bayyinah", src: "albayyinah.mp3" },
+      { title: "Al-Zalzalah", src: "alzalzalah.mp3" },
+      { title: "Al-Adiyat", src: "aladiyyat.mp3" },
+      { title: "Al-Qari'ah", src: "alqariah.mp3" },
+      { title: "At-Takasur", src: "attakasur.mp3" },
+      { title: "Al-Asr", src: "alasr.mp3" },
+      { title: "Al-Humazah", src: "alhumazah.mp3" },
+      { title: "Al-Fil", src: "alfil.mp3" },
+      { title: "Al-Quraisy", src: "alquraisy.mp3" },
+      { title: "Al-Maun", src: "almaun.mp3" },
+      { title: "Al-Kautsar", src: "alkautsar.mp3" },
+      { title: "Al-Kafirun", src: "alkafirun.mp3" },
+      { title: "An-Nasr", src: "anasr.mp3" },
+      { title: "Al-Lahab", src: "allahab.mp3" },
+      { title: "Al-Ikhlas", src: "alikhlas.mp3" },
+      { title: "Al-Falaq", src: "alfalaq.mp3" },
+      { title: "An-Nas", src: "annas.mp3" }
+    ];
+
+    const audio = document.getElementById("audioPlayer");
+    const seekBar = document.getElementById("seekBar");
+    const currentTimeLabel = document.getElementById("currentTime");
+    const durationLabel = document.getElementById("duration");
+    const playlistDiv = document.getElementById("playlist");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const searchBar = document.getElementById("searchBar");
+
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    // --- Buat Playlist ---
+    function renderPlaylist(filter = "") {
+      playlistDiv.innerHTML = "";
+      songs.forEach((song, index) => {
+        if (song.title.toLowerCase().includes(filter.toLowerCase())) {
+          const item = document.createElement("div");
+          item.textContent = song.title;
+          item.classList.add("playlist-item");
+          if (index === currentIndex) item.classList.add("active");
+          item.addEventListener("click", () => loadSong(index, true));
+          playlistDiv.appendChild(item);
+        }
+      });
+    }
+
+    searchBar.addEventListener("input", (e) => {
+      renderPlaylist(e.target.value);
+    });
+
+    function updatePlaylistUI() {
+      document.querySelectorAll(".playlist-item").forEach((el, i) => {
+        el.classList.toggle("active", el.textContent === songs[currentIndex].title);
+      });
+    }
+
+    function loadSong(index, autoPlay = false) {
+      currentIndex = index;
+      audio.src = songs[currentIndex].src;
+      updatePlaylistUI();
+      if (autoPlay) {
+        audio.play();
+        isPlaying = true;
+        updatePlayPauseButton();
+      }
+    }
+
+    function nextSong() {
+      currentIndex = (currentIndex + 1) % songs.length;
+      loadSong(currentIndex, true);
+    }
+
+    function prevSong() {
+      currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+      loadSong(currentIndex, true);
+    }
+
+    function togglePlayPause() {
+      if (!audio.src) loadSong(currentIndex);
+      if (isPlaying) audio.pause();
+      else audio.play();
+    }
+
+    function updatePlayPauseButton() {
+      playPauseBtn.textContent = isPlaying ? "⏸️ " : "▶️ ";
+    }
+
+    audio.addEventListener("play", () => {
+      isPlaying = true;
+      updatePlayPauseButton();
+    });
+
+    audio.addEventListener("pause", () => {
+      isPlaying = false;
+      updatePlayPauseButton();
+    });
+
+    // Progress bar
+    audio.addEventListener("loadedmetadata", () => {
+      durationLabel.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      seekBar.value = (audio.currentTime / audio.duration) * 100;
+      currentTimeLabel.textContent = formatTime(audio.currentTime);
+    });
+
+    seekBar.addEventListener("input", () => {
+      audio.currentTime = (seekBar.value / 100) * audio.duration;
+    });
+
+    audio.addEventListener("ended", nextSong);
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? "0" + secs : secs}`;
+    }
+
+    // Muat awal
+    renderPlaylist();
+    loadSong(0);
+  </script>
+
+</body>
+</html>
